@@ -1,0 +1,15 @@
+version: "3.5"
+services:
+  loss-network-analysis:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+
+    image: loss-network-analysis/devcontainer:1
+    container_name: "loss-network-analysis_devcontainer"
+
+    volumes:
+      - ..:/workspace:cached
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: /bin/sh -c "while sleep 1000; do :; done"

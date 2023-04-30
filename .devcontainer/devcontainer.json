@@ -1,0 +1,47 @@
+{
+	"name": "Loss Network Analysis",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "loss-network-analysis",
+	"shutdownAction": "stopCompose",
+	"workspaceFolder": "/workspace",
+	"settings": {
+		"terminal.integrated.shell.linux": "/bin/bash",
+		"python.pythonPath": "/usr/local/bin/python",
+		"python.envFile": "${workspaceFolder}/.env",
+		"python.testing.pytestArgs": [
+			"tests"
+		],
+		"python.testing.pytestEnabled": true,
+		"python.linting.enabled": true,
+		"python.linting.pylintEnabled": true,
+		"python.formatting.autopep8Path": "/usr/local/py-utils/bin/autopep8",
+		"python.formatting.blackPath": "/usr/local/py-utils/bin/black",
+		"python.formatting.yapfPath": "/usr/local/py-utils/bin/yapf",
+		"python.formatting.provider": "autopep8",
+		"editor.formatOnSave": true,
+		"editor.rulers": [
+			79
+		],
+		"python.linting.banditPath": "/usr/local/py-utils/bin/bandit",
+		"python.linting.flake8Path": "/usr/local/py-utils/bin/flake8",
+		"python.linting.mypyPath": "/usr/local/py-utils/bin/mypy",
+		"python.linting.pycodestylePath": "/usr/local/py-utils/bin/pycodestyle",
+		"python.linting.pydocstylePath": "/usr/local/py-utils/bin/pydocstyle",
+		"python.linting.pylintPath": "/usr/local/py-utils/bin/pylint",
+		"python.testing.pytestPath": "/usr/local/py-utils/bin/pytest",
+		"files.exclude": {
+			"**/.git": true,
+			"**/.DS_Store": true,
+			"**/.pytest_cache": true,
+			"**/__pycache__": true
+		}
+	},
+	"extensions": [
+		"ms-python.python",
+		"davidanson.vscode-markdownlint",
+		"tehnix.vscode-tidymarkdown",
+		"redhat.vscode-yaml",
+		"ms-vsliveshare.vsliveshare",
+		"mutantdino.resourcemonitor"
+	]
+}

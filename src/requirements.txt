@@ -1,0 +1,11 @@
+torch
+torchvision
+pytorch-lightning
+scipy
+bs4
+kaggle
+scikit-learn
+scikit-image
+kornia
+opencv-python
+wandb

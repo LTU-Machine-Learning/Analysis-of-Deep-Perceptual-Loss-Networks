@@ -1,6 +1,6 @@
 # Systematic Analysis of Deep Percpetual Loss Networks
 
-This repository contains the implementation for evaluating loss networks for deep perceptual loss and similarity for the work ["A Systematic Performance Analysis of Deep Perceptual Loss Networks Breaks Transfer Learning Conventions"](https://arxiv.org/abs/2302.04032).
+This repository contains the implementation for evaluating loss networks for deep perceptual loss and similarity for the work ["A Systematic Performance Analysis of Deep Perceptual Loss Networks: Breaking Transfer Learning Conventions"](https://arxiv.org/abs/2302.04032).
 This work analyzes how different pretrained architectures and feature extraction layer affect performance for training with deep percpetual loss or when measuring perceptual similarity with deep perceptual similarity metrics.
 To do this four previous works have been implemented and reevaluated with host of new loss networks.
 The four implemented works and the folder with their implementation is detailed below:
@@ -53,7 +53,7 @@ If you use this repository as part of a scientific work please cite the original
 @inproceedings{pihlgren2023systematic,
     doi = {10.48550/ARXIV.2302.04032},
     author = {Pihlgren, Gustav Grund and Nikolaidou, Konstantina and Chhipa, Prakash Chandra and Abid, Nosheen and Saini, Rajkumar and Sandin, Fredrik and Liwicki, Marcus},
-    title = {A Systematic Performance Analysis of Deep Perceptual Loss Networks Breaks Transfer Learning Conventions},
+    title = {A Systematic Performance Analysis of Deep Perceptual Loss Networks: Breaking Transfer Learning Conventions},
     publisher = {arXiv preprint},
     year = {2023},
 }

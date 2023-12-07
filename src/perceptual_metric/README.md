@@ -12,7 +12,7 @@ To gather all information into a single ````.csv``` file simply run ```python pe
 ### Parameters
 These parameters are shared between ```experiment.py``` and ```augmentations.py``` 
 Besides ```--loss_nets```, ```--extraction_layers```, ```--no_multilayer```, ```--variants```, and ```--repetitions``` all parameters are by default the same as those used in the experiments.
-Using ```--use_experiment_setup``` will automatically use the loss networks and layers that were used in the paper (and overwrite those parameters if they are provided).
+Using ```--use_experiment_setup``` will automatically use the loss networks and layers that were used in the paper and overwrite those parameters if they are provided (the paper that this repo is for, not the original work).
 Running ```python experiments.py --help``` will give a list of all the available parameters.
 
 #### Loss Networks
@@ -20,16 +20,16 @@ The ```--loss_nets <loss networks to use>``` parameter determine which Torchivis
 While multiple loss networks can be specified it is recommended to only run with one at a time since you would likely use different layers for different architectures anyways.
 
 #### Feature layers
-The ```--extraction_layers <first layer> <layer layers(optional)> ``` parameter indicate at which layers features should be extracted for deep perceptual loss.
+The ```--extraction_layers <first layer> <later layers(optional)> ``` parameter indicate at which layers features should be extracted for deep perceptual loss.
 Each loss network will have features extracted at these layers to use for similarity calculation.
 If the ```--no_multilayer``` parameter is used instead one metric will be created per layer that only does extraction from that layer.
 
 #### Variants
 The ```--variants <variant> <more variants(optional)>``` parameter selects if and how the metric will be trained.
-The available options are ```baseline```, ```lin```, ```fine-tune```, and ```scratch```.
+The available options are ```baseline```, ```lin```, ```tune```, and ```scratch```.
 ```baseline``` creates a metric that is pretrained on ImageNet and applies it without additional training.
 ```lin``` creates a pretrainted metric and trains a layer of positive scalars which the extracted deep features are multiplied by.
-```fine-tune``` creates a pretrained metric and trains both the loss network and the scalars.
+```tune``` creates a pretrained metric and trains both the loss network and the scalars.
 ```scratch``` creates a metric with a randomly initialized loss network which is trained with the scalars.
 
 #### Comparison Function
@@ -74,3 +74,14 @@ Images from two datasets are available for this purpose ```svhn``` and ```stl10`
 To test adaptibility a metric should be tested on a number of different rankings of the augmentations.
 The number to test is given by the ```--rankings``` parameter.
 If not all augmentations should be used in rankings this can be specified with the ```--augmentations``` parameter followed by the augmentations to use.
+
+## Experiments of the Original Work
+To run the experiments as they were conducted in [The Unreasonable Effectiveness of Deep Features as a Perceptual Metric](https://richzhang.github.io/PerceptualSimilarity) the correct loss networks, feature layers, and comparison methods have to be used.
+All of the different ```--variants``` options are taken from the original work and therefore directly map to the corresponding results in that work, using all the options for this flag will run all the experiments.
+To recreate the original experiments will require a minimum of three runs as the AlexNet, SqueezeNet 1.1, and VGG-16 experiments use different layers.
+The commands to run them are detailed below:
+```bash
+python experiments.py --loss_nets alexnet --extraction_layers 1 4 7 9 11 --variants baseline lin scratch tune
+python experiments.py --loss_nets squeezenet1_1 --extraction_layers 1 4 7 9 10 11 12 --variants baseline lin scratch tune
+python experiments.py --loss_nets vgg16 --extraction_layers 3 8 15 22 29 --variants baseline lin scratch tune
+```

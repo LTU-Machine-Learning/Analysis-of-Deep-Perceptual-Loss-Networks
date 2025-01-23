@@ -20,6 +20,7 @@ from PIL import Image
 import random
 import argparse
 import time, datetime
+import csv
 
 from workspace_path import home_path
 
@@ -256,35 +257,35 @@ def set_collector(dataset='SET5', **kwargs):
 
 def bapps_collector(split='train', subsplit='all', **kwargs):
     '''
-    Function for collecting and, if necessary, downloading the BAPPS dataset
+    Function for collecting and, if necessary, downloading the BAPPS dataset.
+
     Args:
         split (str): Which split to collect ('train', 'val', 'jnd/val')
         subsplit (str): Which subsplit to collect ('all' collects all)
         **kwargs (dict): Any additional parameters for collection
-    Returns (torch.utils.data.Dataset)
+    Returns:
+        torch.utils.data.Dataset: The given split of the BAPPS dataset
     '''
-    (root_folder/'BAPPS/train').mkdir(parents=True, exist_ok=True)
-    (root_folder/'BAPPS/val').mkdir(parents=True, exist_ok=True)
-    (root_folder/'BAPPS/jnd/val').mkdir(parents=True, exist_ok=True)
-    if (
-        len(os.listdir(root_folder/'BAPPS/train')) < 3
-        or len(os.listdir(root_folder/'BAPPS/val')) < 6
-        or len(os.listdir(root_folder/'BAPPS/jnd/val')) < 2
+    (root_folder/'BAPPS').mkdir(parents=True, exist_ok=True)
+    if not (
+        (root_folder/'BAPPS/train').exists() and
+        (root_folder/'BAPPS/val').exists() and
+        (root_folder/'BAPPS/jnd/val').exists()
     ):
         if 'download' in kwargs and not kwargs['download']:
             raise FileNotFoundError(
                 'Files are missing. Set \'download\' to True to automatically '
                 'download them')
         print('Downloading BAPPS dataset...')
-        dataset_link = 'https://people.eecs.berkeley.edu/~rich.zhang/projects/2018_perceptual/dataset'
-        dataset_parts = ['twoafc_train', 'twoafc_val', 'jnd']
-        for part in dataset_parts:
-            filename = root_folder/f'BAPPS/{part}.tar.gz'
-            if not os.path.isfile(filename):
-                download_raw_url(url=f'{dataset_link}/{part}.tar.gz',
-                                 save_path=filename)
-            with tarfile.TarFile(filename, 'r') as tar_ref:
-                tar_ref.extractall(root_folder/'BAPPS')
+        path = root_folder/'BAPPS'
+        kaggle_download(
+            'chaitanyakohli678/berkeley-adobe-perceptual-patch-similarity-bapps',
+            path, unzip=True
+        )
+        (path/'dataset/2afc/train').rename(path/'train')
+        (path/'dataset/2afc/val').rename(path/'val')
+        (path/'dataset/jnd').rename(path/'jnd')
+        (path/'dataset').rmdir()
     subsplits = os.listdir(root_folder/f'BAPPS/{split}')
     if subsplit == 'all':
         ret = []
@@ -293,8 +294,8 @@ def bapps_collector(split='train', subsplit='all', **kwargs):
             paths = [root_folder/f'BAPPS/{split}/{subsplit}/{d}' for d in dirs]
             ret.append(MultipleFolderDataset(
                 *paths, name=subsplit,
-                image_transform=kwargs.get('image_transform'))
-            )
+                image_transform=kwargs.get('image_transform')
+            ))
         return ConcatDataset(ret)
     elif subsplit in subsplits:
         dirs = os.listdir(root_folder/f'BAPPS/{split}/{subsplit}')
@@ -410,6 +411,55 @@ def download_single_file(
             f'{len(list(folder.glob("*")))}/{max_items}'
         )
     return
+
+
+def _kaggle_init():
+    '''
+    Prepares and returns a Kaggle API using keys in api_keys.csv
+
+    Returns:
+        KaggleApi: A prepared and authenticated Kaggle API
+    '''
+    keyfile = home_path/'api_keys.csv'
+    if not keyfile.is_file():
+        raise RuntimeError(
+            f'Missing file {keyfile}. Create it as an empty file and rerun.'
+        )
+    kaggle_username = None
+    kaggle_key = None
+    with open(home_path/'api_keys.csv') as keyfile:
+        key_reader = csv.reader(keyfile)
+        for key, value in key_reader:
+            if key == 'kaggle_username':
+                kaggle_username = value
+            elif key == 'kaggle_key':
+                kaggle_key = value
+    if kaggle_username is None or kaggle_key is None:
+        raise RuntimeError(
+            f'Kaggle keys missing. Log in to '
+            f'https://www.kaggle.com/<username>/account and download an API '
+            f'token via "Create API Token" and paste the username and key '
+            f'into {keyfile} as "kaggle_username,<username>" and '
+            f'"kaggle_key,<key>"')
+    os.environ['KAGGLE_USERNAME'] = kaggle_username
+    os.environ['KAGGLE_KEY'] = kaggle_key
+    from kaggle.api.kaggle_api_extended import KaggleApi
+    api = KaggleApi()
+    api.authenticate()
+    return api
+
+
+def kaggle_download(dataset, path, **kwargs):
+    '''
+    Downloads a given dataset from kaggle to a given folder.
+
+    Args:
+        dataset (str): Dataset to download
+        path (str): Path to folder of dataset
+        **kwargs (dict): Any additional parameters for downloading
+    '''
+    api = _kaggle_init()
+    api.dataset_download_files(dataset, path, **kwargs)
 
 
 class MultipleFolderDataset(Dataset):

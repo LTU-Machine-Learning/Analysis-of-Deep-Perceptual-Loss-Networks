@@ -40,6 +40,7 @@ scikit-image 0.20.0
 scipy 1.8.0
 opencv-python 4.7.0.72
 kornia 0.6.10
+kaggle 1.6.17
 ```
 
 Some implementations also use logging with Weights and Biases.
